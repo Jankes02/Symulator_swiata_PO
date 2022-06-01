@@ -2,6 +2,8 @@ import pygame as pg
 from enum import Enum
 from Punkt import Punkt
 import random
+from Zwierzeta import Antylopa, CyberOwca, Lis, Owca, Wilk, Zolw, Czlowiek
+from Rosliny import BarszczSosnowskiego, Guarana, Mlecz, Trawa, WilczeJagody
 
 SCREEN_HEIGHT = 800
 SCREEN_WIDTH = 800
@@ -88,7 +90,7 @@ class Swiat:
         pg.display.update()
 
     def get_sasiad(self, pole, kierunek):
-        temp = Punkt.Punkt(pole.y, pole.x)
+        temp = Punkt(pole.y, pole.x)
         match kierunek:
             case Kierunek.PRAWO:
                 if temp.x < self.__szerokosc - 1:
@@ -107,31 +109,31 @@ class Swiat:
     def nowy_organizm(self, typ_organizmu, pole):
         match typ_organizmu:
             case "Antylopa":
-                return Antylopa(pole, self)
+                return Antylopa.Antylopa(pole, self)
             case "Wilk":
-                return Wilk(pole, self)
+                return Wilk.Wilk(pole, self)
             case "Owca":
-                return Owca(pole, self)
+                return Owca.Owca(pole, self)
             case "Lis":
-                return Lis(pole, self)
+                return Lis.Lis(pole, self)
             case "Zolw":
-                return Zolw(pole, self)
+                return Zolw.Zolw(pole, self)
             case "CyberOwca":
-                return CyberOwca(pole, self)
+                return CyberOwca.CyberOwca(pole, self)
 
             case "Mlecz":
-                return Mlecz(pole, self)
+                return Mlecz.Mlecz(pole, self)
             case "Trawa":
-                return Trawa(pole, self)
+                return Trawa.Trawa(pole, self)
             case "Guarana":
-                return Guarana(pole, self)
+                return Guarana.Guarana(pole, self)
             case "WilczeJagody":
-                return WilczeJagody(pole, self)
+                return WilczeJagody.WilczeJagody(pole, self)
             case "BarszczSosnowskiego":
-                return BarszczSosnowskiego(pole, self)
+                return BarszczSosnowskiego.BarszczSosnowskiego(pole, self)
 
             case "Czlowiek":
-                return Czlowiek(pole, self)
+                return Czlowiek.Czlowiek(pole, self)
 
     def dodaj_organizm(self, organizm):
         self.__organizmy.insert(0, organizm)
@@ -147,7 +149,7 @@ class Swiat:
         return None
 
     def nowa_gra(self):
-        self.__czlowiek = Czlowiek(Punkt(self.__wysokosc // 2, self.__szerokosc // 2), self)
+        self.__czlowiek = Czlowiek.Czlowiek(Punkt(self.__wysokosc // 2, self.__szerokosc // 2), self)
         self.dodaj_organizm(self.__czlowiek)
         typy = ["Wilk", "Owca", "Lis", "Antylopa", "Zolw", "CyberOwca",
                 "Mlecz", "Trawa", "Guarana", "WilczeJagody", "BarszczSosnowskiego"]
