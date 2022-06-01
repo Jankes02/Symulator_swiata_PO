@@ -161,5 +161,8 @@ class Swiat:
                 self.dodaj_organizm(self.nowy_organizm(typ, pozycja_dodawanego_organizmu))
         self.rysuj()
 
+    def get_organizmy(self):
+        return self.__organizmy
+
     def test(self):
         self.rysuj()
