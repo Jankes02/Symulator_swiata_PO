@@ -2,6 +2,7 @@ import pygame as pg
 from enum import Enum
 from Punkt import Punkt
 import random
+
 SCREEN_HEIGHT = 800
 SCREEN_WIDTH = 800
 SURFACE_HEIGHT = 0.75 * SCREEN_HEIGHT
