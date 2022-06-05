@@ -24,7 +24,7 @@ class Antylopa(Zwierze):
         return False
 
     def umiera(self, zabojca):
-        if random.randint(0, 100) < szansa_na_ucieczke:
+        if random.randrange(100) < szansa_na_ucieczke:
             self.ucieka(zabojca)
         else:
             self.usmierc(zabojca)

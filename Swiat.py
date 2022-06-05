@@ -1,25 +1,22 @@
 import pygame as pg
-from enum import Enum
 from Punkt import Punkt
+from Kierunek import Kierunek
 import random
 from Zwierzeta import Antylopa, CyberOwca, Lis, Owca, Wilk, Zolw, Czlowiek
 from Rosliny import BarszczSosnowskiego, Guarana, Mlecz, Trawa, WilczeJagody
+import os.path
 
-SCREEN_HEIGHT = 800
-SCREEN_WIDTH = 800
-SURFACE_HEIGHT = 0.75 * SCREEN_HEIGHT
-SURFACE_WIDTH = 0.75 * SCREEN_WIDTH
-
-
-class Kierunek(Enum):
-    PRAWO = 0
-    DOL = 1
-    LEWO = 2
-    GORA = 3
+SCREEN_HEIGHT = 1000
+SCREEN_WIDTH = 1000
+SURFACE_HEIGHT = 0.7 * SCREEN_HEIGHT
+SURFACE_WIDTH = 0.7 * SCREEN_WIDTH
 
 
 class Swiat:
-    __NAZWY_ZWIERZAT = ["Czlowiek", "Wilk", "Owca", "Lis", "Antylopa", "Zolw"]
+    __NAZWY_ORGANIZMOW = ["Czlowiek", "Wilk", "Owca", "Lis", "Antylopa", "Zolw", "CyberOwca", "Mlecz", "Trawa",
+                          "Guarana", "WilczeJagody", "BarszczSosnowskiego"]
+    __NAZWY_ZWIERZAT = ["Czlowiek", "Wilk", "Owca", "Lis", "Antylopa", "Zolw", "CyberOwca"]
+    __ikonki = {}
     __nr_tury = 0
     __kontynuuj = True
     __organizmy = []
@@ -33,10 +30,11 @@ class Swiat:
         self.UNIT_SIZE = int(SURFACE_WIDTH / max(m, n))
         pg.init()
         self.__ekran = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
-        self.__ekran.fill((255, 255, 255)) #Bialy
-        self.__plansza = pg.Surface((SURFACE_WIDTH, SURFACE_HEIGHT))
-        self.__plansza = self.__plansza.convert()
-        self.__plansza.fill("#BEBEBE") #Jasno szary
+        self.__plansza = pg.Surface((SURFACE_WIDTH, SURFACE_HEIGHT)).convert()
+        for typ in self.__NAZWY_ORGANIZMOW:
+            img = pg.image.load(os.path.join("Ikony", typ + ".png"))
+            img_scaled = pg.transform.scale(img, (self.UNIT_SIZE, self.UNIT_SIZE))
+            self.__ikonki[typ] = img_scaled
 
     def __ustal_kolejnosc(self):
         last_org = None
@@ -79,13 +77,22 @@ class Swiat:
         for org in self.__organizmy:
             if org == last_org:
                 continue
-            org.akcja()
+            org.akcja(kierunek)
             last_org = org
 
         self.__usun_martwe()
         self.rysuj()
 
+    def rysuj_organizmy(self):
+        for org in self.__organizmy:
+            if org.zyje():
+                self.__plansza.blit(self.__ikonki[org.to_string()],
+                                    (org.get_pozycja().x * self.UNIT_SIZE, org.get_pozycja().y * self.UNIT_SIZE))
+
     def rysuj(self):
+        self.__ekran.fill((255, 255, 255))  # Bialy
+        self.__plansza.fill("#BEBEBE")  # Jasno szary
+        self.rysuj_organizmy()
         self.__ekran.blit(self.__plansza, (0, 0))
         pg.display.update()
 
@@ -155,11 +162,11 @@ class Swiat:
                 "Mlecz", "Trawa", "Guarana", "WilczeJagody", "BarszczSosnowskiego"]
         for i in range(2):
             for typ in typy:
-                pozycja_dodawanego_organizmu = Punkt(random.randint(0, self.__wysokosc),
-                                                     random.randint(0, self.__szerokosc))
+                pozycja_dodawanego_organizmu = Punkt(random.randrange(self.__wysokosc),
+                                                     random.randrange(self.__szerokosc))
                 while self.sprawdz_pole(pozycja_dodawanego_organizmu) is not None:
-                    pozycja_dodawanego_organizmu.y = random.randint(0, self.__wysokosc);
-                    pozycja_dodawanego_organizmu.x = random.randint(0, self.__szerokosc);
+                    pozycja_dodawanego_organizmu.y = random.randrange(self.__wysokosc)
+                    pozycja_dodawanego_organizmu.x = random.randrange(self.__szerokosc)
 
                 self.dodaj_organizm(self.nowy_organizm(typ, pozycja_dodawanego_organizmu))
         self.rysuj()

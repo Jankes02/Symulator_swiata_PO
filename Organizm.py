@@ -1,7 +1,6 @@
-from Punkt import Punkt
-import os.path
-
 LICZBA_KIERUNKOW = 4
+from Swiat import *
+
 
 class Organizm:
     _zabojca = None
@@ -13,13 +12,9 @@ class Organizm:
     def __init__(self, pole, swiat):
         self._swiat = swiat
         self._pozycja = pole
-        self._sciezka_ikony = os.path.join("C:\Users\janke\PycharmProjects\PO\ikony", self.__class__.__name__ + ".png")
 
-    def akcja(self):
+    def akcja(self, kierunek_czlowieka=None):
         pass
-
-    def akcja(self, kierunek_czlowieka):
-        self.akcja()
 
     def zyje(self):
         return self._zyje
@@ -36,13 +31,13 @@ class Organizm:
     def get_sila(self):
         return self._sila
 
+    def get_inicjatywa(self):
+        return self._inicjatywa
+
     def get_wiek(self):
         return self._wiek
 
-    def get_sciezka_ikony(self):
-        return self._sciezka_ikony
-
-    def is_greater(self, drugi):
+    def __gt__(self, drugi):
         if self._inicjatywa > drugi.get_inicjatywa():
             return True
 
@@ -53,6 +48,9 @@ class Organizm:
 
     def to_string(self):
         return self.__class__.__name__
+
+    def update_wiek_i_rozmnazanie(self):
+        self._wiek += 1
 
     def usmierc(self, zabojca):
         self._zabojca = zabojca.to_string() + zabojca.get_pozycja().to_string()
