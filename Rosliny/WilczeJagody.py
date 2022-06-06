@@ -6,6 +6,6 @@ class WilczeJagody(Roslina):
         super().__init__(pole, swiat)
         self._sila = 99
 
-    def umiera(self, zabojca):
+    def umiera(self, zabojca, atakuje=False):
         zabojca.usmierc(self)
         self.usmierc(zabojca)

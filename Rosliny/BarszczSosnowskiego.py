@@ -8,7 +8,7 @@ class BarszczSosnowskiego(Roslina):
         if swiat.get_nr_tury() > 0:
             self.__sprawdz_sasiadow()
 
-    def umiera(self, zabojca):
+    def umiera(self, zabojca, atakuje=False):
         zabojca.usmierc(self)
         self.usmierc(zabojca)
 

@@ -19,8 +19,11 @@ class Organizm:
     def zyje(self):
         return self._zyje
 
-    def umiera(self, zabojca):
+    def umiera(self, zabojca, atakuje=False):
         self.usmierc(zabojca)
+
+    def set_pozycja(self, pole):
+        self._pozycja = pole
 
     def get_pozycja(self):
         return self._pozycja

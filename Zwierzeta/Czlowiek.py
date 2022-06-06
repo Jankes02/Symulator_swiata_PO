@@ -40,8 +40,8 @@ class Czlowiek(Zwierze):
     def czy_special_aktywny(self):
         return self.__special_aktywny
 
-    def umiera(self, zabojca):
+    def umiera(self, zabojca, atakuje=False):
         if not self.__special_aktywny:
             self.usmierc(zabojca)
         else:
-            self.ucieka(zabojca)
+            self.ucieka(zabojca, atakuje)

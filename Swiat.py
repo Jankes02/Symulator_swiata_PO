@@ -32,7 +32,7 @@ class Swiat:
         pg.init()
         pg.font.init()
         self.__ekran = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
-        self.__plansza = pg.Surface((SURFACE_WIDTH, SURFACE_HEIGHT)).convert()
+        self.__plansza = pg.Surface((self.__szerokosc * self.UNIT_SIZE, self.__wysokosc * self.UNIT_SIZE)).convert()
         self.__czcionka = pg.font.SysFont("timesnewroman", self.__rozmiar_czcionki_komentarzy)
 
         for typ in self.__NAZWY_ORGANIZMOW:
@@ -41,13 +41,6 @@ class Swiat:
             self.__ikonki[typ] = img_scaled
 
     def __ustal_kolejnosc(self):
-#        last_org = None
-#        for org in self.__organizmy:
-#            if last_org and org > last_org:
-#
-#                org, last_org = last_org, org
-#            else:
-#                last_org = org
         self.__organizmy.sort(reverse=True)
 
     def dodaj_komentarz(self, komentarz):
@@ -110,7 +103,7 @@ class Swiat:
         self.__komentarze.insert(0, "Nr tury: " + str(self.__nr_tury))
         pozycja_nastepnego_komentarza = [SURFACE_WIDTH + 10, 0]
         for kom in self.__komentarze:
-            do_druku = self.__czcionka.render(kom, 0, (0, 0, 0))
+            do_druku = self.__czcionka.render(kom, False, (0, 0, 0))
             self.__ekran.blit(do_druku, pozycja_nastepnego_komentarza)
             pozycja_nastepnego_komentarza[1] += self.__rozmiar_czcionki_komentarzy + 20
 
@@ -191,13 +184,118 @@ class Swiat:
             for typ in typy:
                 pozycja_dodawanego_organizmu = Punkt(random.randrange(self.__wysokosc),
                                                      random.randrange(self.__szerokosc))
-                while self.sprawdz_pole(pozycja_dodawanego_organizmu) is not None:
+                while self.sprawdz_pole(pozycja_dodawanego_organizmu) is not None \
+                        or pozycja_dodawanego_organizmu == self.__czlowiek.get_pozycja():
                     pozycja_dodawanego_organizmu.y = random.randrange(self.__wysokosc)
                     pozycja_dodawanego_organizmu.x = random.randrange(self.__szerokosc)
 
                 self.dodaj_organizm(self.nowy_organizm(typ, pozycja_dodawanego_organizmu))
         self.dodaj_organizm(self.__czlowiek)
         self.rysuj()
+
+    def main_loop(self):
+        while self.__kontynuuj:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    exit(0)
+
+                if event.type == pg.KEYDOWN:
+                    czlowiek = self.__czlowiek
+                    if czlowiek.zyje():
+                        if event.key == pg.K_RIGHT:
+                            if czlowiek.get_pozycja().x < self.__szerokosc - 1:
+                                self.wykonaj_ture(Kierunek.PRAWO)
+
+                        if event.key == pg.K_DOWN:
+                            if czlowiek.get_pozycja().y < self.__wysokosc - 1:
+                                self.wykonaj_ture(Kierunek.DOL)
+
+                        if event.key == pg.K_LEFT:
+                            if czlowiek.get_pozycja().x > 0:
+                                self.wykonaj_ture(Kierunek.LEWO)
+
+                        if event.key == pg.K_UP:
+                            if czlowiek.get_pozycja().y > 0:
+                                self.wykonaj_ture(Kierunek.GORA)
+
+                        if event.key == pg.K_SPACE:
+                            if czlowiek.get_special_nr_tury() == 0:
+                                czlowiek.set_special_nr_tury(1)
+                                czlowiek.set_special_aktywny(True)
+                                self.dodaj_komentarz("Aktywacja speciala")
+                            elif czlowiek.czy_special_aktywny():
+                                self.dodaj_komentarz("Special juz aktywny")
+                            else:
+                                self.dodaj_komentarz("Jeszcze nie mozesz aktywowac speciala")
+
+                    if event.key == pg.K_k:
+                        pg.quit()
+                        exit(0)
+
+                    if event.key == pg.K_l:
+                        self.wykonaj_ture(None)
+
+                    if event.key == pg.K_p:
+                        self.zapisz_gre()
+                        pg.quit()
+                        exit(0)
+
+    def zapisz_gre(self):
+        f = open("saved_game.txt", "w")
+        f.write(str(self.__nr_tury) + '\n')
+        f.write(str(self.__wysokosc) + " " + str(self.__szerokosc) + '\n')
+        f.write(str(self.__liczba_organizmow) + '\n')
+        for org in self.__organizmy:
+            f.write(org.to_string() + " " + str(org.get_pozycja().y) + " " + str(org.get_pozycja().x) +
+                    " " + str(org.get_sila()) + " " + str(org.get_wiek()) + " " + str(self.czy_zwierze(org)))
+            if self.czy_zwierze(org):
+                f.write(" " + str(org.kiedy_moze_sie_rozmnazac()))
+                if org.to_string() == "Czlowiek":
+                    f.write(" " + str(org.get_special_nr_tury()) + " " + str(org.czy_special_aktywny()))
+            f.write("\n")
+
+        f.write("Nazwa y x sila wiek czy_zwierze (kiedy_rozmnazanie) (special_nr_tury) (special_aktywny)")
+        f.close()
+
+    def set_nr_tury(self, nr_tury):
+        self.__nr_tury = nr_tury
+
+    @staticmethod
+    def wczytaj_gre():
+        f = open("saved_game.txt", "r")
+        nr_tury = int(f.readline())
+        wymiary = f.readline()
+        wymiary = wymiary.split(" ")
+        wysokosc = int(wymiary[0])
+        szerokosc = int(wymiary[1])
+        swiat = Swiat(wysokosc, szerokosc)
+        liczba_organizmow = int(f.readline())
+        swiat.set_nr_tury(nr_tury)
+        for i in range(liczba_organizmow):
+            line = f.readline()
+            line = line.split(" ")
+            nazwa_typu = line[0]
+            pozycja_organizmu = Punkt(int(line[1]), int(line[2]))
+            org = swiat.nowy_organizm(nazwa_typu, pozycja_organizmu)
+            sila = int(line[3])
+            wiek = int(line[4])
+            czy_zwierze = line[5][0] == "T"
+            if czy_zwierze:
+                tury_przed_rozmnozeniem = int(line[6])
+                if nazwa_typu == "Czlowiek":
+                    special_nr_tury = int(line[7])
+                    special_aktywny = bool(line[8])
+                    org.set_special_nr_tury(special_nr_tury)
+                    org.set_special_aktywny(special_aktywny)
+                    swiat.__czlowiek = org
+                else:
+                    org.set_tury_przed_rozmnozeniem(tury_przed_rozmnozeniem)
+            org.set_sila(sila)
+            org.set_wiek(wiek)
+            swiat.dodaj_organizm(org)
+        f.close()
+        return swiat
 
     def get_organizmy(self):
         return self.__organizmy

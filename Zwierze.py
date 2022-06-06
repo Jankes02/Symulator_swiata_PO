@@ -1,7 +1,7 @@
 from Organizm import *
 from Swiat import *
 
-MIN_WIEK_ROZMNAZANIA = 3
+MIN_WIEK_ROZMNAZANIA = 2
 
 
 class Zwierze(Organizm):
@@ -32,14 +32,19 @@ class Zwierze(Organizm):
                 self._pozycja = pozycja_atakowanego
 
         else:
-            self.umiera(atakowany)
+            self.umiera(atakowany, True)
 
-    def ucieka(self, atakujacy):
+    def ucieka(self, atakujacy, atakuje=False):
         kierunek = random.randrange(LICZBA_KIERUNKOW)
         for i in range(LICZBA_KIERUNKOW):
-            sasiad = self._swiat.sprawdz_pole(self._swiat.get_sasiad(self._pozycja, Kierunek(kierunek)))
+            if atakuje:
+                pozycja_sasiada = self._swiat.get_sasiad(atakujacy.get_pozycja(), Kierunek(kierunek))
+            else:
+                pozycja_sasiada = self._swiat.get_sasiad(self._pozycja, Kierunek(kierunek))
+            sasiad = self._swiat.sprawdz_pole(pozycja_sasiada)
+
             if sasiad is None or sasiad == atakujacy:
-                self.ruch(Kierunek(kierunek))
+                self.set_pozycja(pozycja_sasiada)
                 break
             kierunek += 1
             kierunek %= LICZBA_KIERUNKOW
@@ -78,7 +83,9 @@ class Zwierze(Organizm):
                     swiat.dodaj_organizm(dodany)
                     self._tury_przed_nastepnym_rozmnozeniem = MIN_WIEK_ROZMNAZANIA
                     partner.set_tury_przed_rozmnozeniem(MIN_WIEK_ROZMNAZANIA)
-                    self._swiat.dodaj_komentarz(self.to_string() + " rozmnaza sie na polu " + partner.get_pozycja().to_string())
+                    self._swiat.dodaj_komentarz(partner.to_string() + partner.get_pozycja().to_string() + " + " +
+                                                self.to_string() + self.get_pozycja().to_string() + " = " +
+                                                dodany.to_string() + dodany.get_pozycja().to_string())
                     break
                 kierunek += 1
                 kierunek %= LICZBA_KIERUNKOW

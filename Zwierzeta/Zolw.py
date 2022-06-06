@@ -13,6 +13,6 @@ class Zolw(Zwierze):
         if random.randrange(100) < szansa_na_ruch:
             super().akcja()
 
-    def umiera(self, zabojca):
+    def umiera(self, zabojca, atakuje=False):
         if zabojca.get_sila() > 5:
             self.usmierc(zabojca)
