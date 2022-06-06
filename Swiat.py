@@ -7,9 +7,9 @@ from Rosliny import BarszczSosnowskiego, Guarana, Mlecz, Trawa, WilczeJagody
 import os.path
 
 SCREEN_HEIGHT = 1000
-SCREEN_WIDTH = 1000
+SCREEN_WIDTH = 1200
 SURFACE_HEIGHT = 0.7 * SCREEN_HEIGHT
-SURFACE_WIDTH = 0.7 * SCREEN_WIDTH
+SURFACE_WIDTH = SURFACE_HEIGHT
 
 
 class Swiat:
@@ -22,6 +22,7 @@ class Swiat:
     __organizmy = []
     __liczba_organizmow = 0
     __komentarze = []
+    __rozmiar_czcionki_komentarzy = 20
 
     def __init__(self, n, m):
         self.__czlowiek = None
@@ -29,20 +30,28 @@ class Swiat:
         self.__szerokosc = m
         self.UNIT_SIZE = int(SURFACE_WIDTH / max(m, n))
         pg.init()
+        pg.font.init()
         self.__ekran = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
         self.__plansza = pg.Surface((SURFACE_WIDTH, SURFACE_HEIGHT)).convert()
+        self.__czcionka = pg.font.SysFont("timesnewroman", self.__rozmiar_czcionki_komentarzy)
+
         for typ in self.__NAZWY_ORGANIZMOW:
             img = pg.image.load(os.path.join("Ikony", typ + ".png"))
             img_scaled = pg.transform.scale(img, (self.UNIT_SIZE, self.UNIT_SIZE))
             self.__ikonki[typ] = img_scaled
 
     def __ustal_kolejnosc(self):
-        last_org = None
-        for org in self.__organizmy:
-            if last_org and org > last_org:
-                org, last_org = last_org, org
-            else:
-                last_org = org
+#        last_org = None
+#        for org in self.__organizmy:
+#            if last_org and org > last_org:
+#
+#                org, last_org = last_org, org
+#            else:
+#                last_org = org
+        self.__organizmy.sort(reverse=True)
+
+    def dodaj_komentarz(self, komentarz):
+        self.__komentarze.append(komentarz)
 
     def kontynuuj(self):
         return self.__kontynuuj
@@ -89,10 +98,29 @@ class Swiat:
                 self.__plansza.blit(self.__ikonki[org.to_string()],
                                     (org.get_pozycja().x * self.UNIT_SIZE, org.get_pozycja().y * self.UNIT_SIZE))
 
+    def rysuj_plansze(self):
+        self.__plansza.fill("#BEBEBE")  # Jasno szary
+        for i in range(1, self.__szerokosc):
+            pg.draw.line(self.__plansza, (0, 0, 0), (i * self.UNIT_SIZE, 0), (i * self.UNIT_SIZE, SURFACE_HEIGHT))
+
+        for i in range(1, self.__wysokosc):
+            pg.draw.line(self.__plansza, (0, 0, 0), (0, i * self.UNIT_SIZE), (SURFACE_WIDTH, i * self.UNIT_SIZE))
+
+    def rysuj_komentarze(self):
+        self.__komentarze.insert(0, "Nr tury: " + str(self.__nr_tury))
+        pozycja_nastepnego_komentarza = [SURFACE_WIDTH + 10, 0]
+        for kom in self.__komentarze:
+            do_druku = self.__czcionka.render(kom, 0, (0, 0, 0))
+            self.__ekran.blit(do_druku, pozycja_nastepnego_komentarza)
+            pozycja_nastepnego_komentarza[1] += self.__rozmiar_czcionki_komentarzy + 20
+
+        self.__komentarze.clear()
+
     def rysuj(self):
         self.__ekran.fill((255, 255, 255))  # Bialy
-        self.__plansza.fill("#BEBEBE")  # Jasno szary
+        self.rysuj_plansze()
         self.rysuj_organizmy()
+        self.rysuj_komentarze()
         self.__ekran.blit(self.__plansza, (0, 0))
         pg.display.update()
 
@@ -157,7 +185,6 @@ class Swiat:
 
     def nowa_gra(self):
         self.__czlowiek = Czlowiek.Czlowiek(Punkt(self.__wysokosc // 2, self.__szerokosc // 2), self)
-        self.dodaj_organizm(self.__czlowiek)
         typy = ["Wilk", "Owca", "Lis", "Antylopa", "Zolw", "CyberOwca",
                 "Mlecz", "Trawa", "Guarana", "WilczeJagody", "BarszczSosnowskiego"]
         for i in range(2):
@@ -169,6 +196,7 @@ class Swiat:
                     pozycja_dodawanego_organizmu.x = random.randrange(self.__szerokosc)
 
                 self.dodaj_organizm(self.nowy_organizm(typ, pozycja_dodawanego_organizmu))
+        self.dodaj_organizm(self.__czlowiek)
         self.rysuj()
 
     def get_organizmy(self):

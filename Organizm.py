@@ -55,6 +55,10 @@ class Organizm:
     def usmierc(self, zabojca):
         self._zabojca = zabojca.to_string() + zabojca.get_pozycja().to_string()
         self._zyje = False
+        if self._swiat.czy_zwierze(self):
+            self._swiat.dodaj_komentarz(self._zabojca + " zabija " + self.to_string() + self._pozycja.to_string())
+        else:
+            self._swiat.dodaj_komentarz(self._zabojca + " zjada " + self.to_string() + self._pozycja.to_string())
 
     def set_sila(self, sila):
         self._sila = sila

@@ -1,4 +1,4 @@
-# from main_menu import *
+#from main_menu import *
 import pygame as pg
 import Swiat
 import random

@@ -14,7 +14,7 @@ class Czlowiek(Zwierze):
         if self.__special_nr_tury > 0:
             self.__special_nr_tury %= 5
             if self.__special_nr_tury == 0:
-                print("Dezaktywacja speciala")
+                self._swiat.dodaj_komentarz("Dezaktywacja speciala")
                 self.__special_nr_tury -= 5
                 self.__special_aktywny = False
             else:
@@ -40,6 +40,8 @@ class Czlowiek(Zwierze):
     def czy_special_aktywny(self):
         return self.__special_aktywny
 
-    def usmierc(self, zabojca):
-        self._zyje = False
-        # KOMENTARZ?
+    def umiera(self, zabojca):
+        if not self.__special_aktywny:
+            self.usmierc(zabojca)
+        else:
+            self.ucieka(zabojca)

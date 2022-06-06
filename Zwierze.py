@@ -1,7 +1,7 @@
 from Organizm import *
 from Swiat import *
 
-MIN_WIEK_ROZMNAZANIA = 10
+MIN_WIEK_ROZMNAZANIA = 3
 
 
 class Zwierze(Organizm):
@@ -26,9 +26,11 @@ class Zwierze(Organizm):
             atakowany.rozmnoz_sie(self)
 
         elif self._sila >= atakowany.get_sila() or atakowany.czy_roslina_trujaca():
+            pozycja_atakowanego = Punkt(atakowany.get_pozycja().y, atakowany.get_pozycja().x)
             atakowany.umiera(self)
-            if not atakowany.zyje():
-                self._pozycja = atakowany.get_pozycja()
+            if not atakowany.zyje() or not atakowany.get_pozycja() == pozycja_atakowanego:
+                self._pozycja = pozycja_atakowanego
+
         else:
             self.umiera(atakowany)
 
@@ -76,6 +78,7 @@ class Zwierze(Organizm):
                     swiat.dodaj_organizm(dodany)
                     self._tury_przed_nastepnym_rozmnozeniem = MIN_WIEK_ROZMNAZANIA
                     partner.set_tury_przed_rozmnozeniem(MIN_WIEK_ROZMNAZANIA)
+                    self._swiat.dodaj_komentarz(self.to_string() + " rozmnaza sie na polu " + partner.get_pozycja().to_string())
                     break
                 kierunek += 1
                 kierunek %= LICZBA_KIERUNKOW
