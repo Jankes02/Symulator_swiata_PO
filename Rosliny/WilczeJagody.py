@@ -1,10 +1,11 @@
 from Roslina import *
 
 
-class Guarana(Roslina):
+class WilczeJagody(Roslina):
     def __init__(self, pole, swiat):
         super().__init__(pole, swiat)
+        self._sila = 99
 
-    def umiera(self, zabojca):
-        zabojca.set_sila(zabojca.get_sila() + 3)
+    def umiera(self, zabojca, atakuje=False):
+        zabojca.usmierc(self)
         self.usmierc(zabojca)

@@ -1,6 +1,4 @@
 from Organizm import *
-from Swiat import *
-
 prawd_rozmnozenia = 15  # %
 
 
@@ -12,14 +10,14 @@ class Roslina(Organizm):
         self._sila = 0
         self._inicjatywa = 0
 
-    def akcja(self):
+    def akcja(self, kierunek_czlowieka=None):
         for i in range(self._proby_rozmnozenia_na_ture):
-            if random.randint(0, 100) < prawd_rozmnozenia:
+            if random.randrange(100) < prawd_rozmnozenia:
                 self.rozmnoz()
                 break
 
     def rozmnoz(self):
-        kierunek = random.randint(0, LICZBA_KIERUNKOW)
+        kierunek = random.randrange(LICZBA_KIERUNKOW)
         swiat = self._swiat
         sasiad = swiat.sprawdz_pole(swiat.get_sasiad(self._pozycja, Kierunek(kierunek)))
         if sasiad is None:

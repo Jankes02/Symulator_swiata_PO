@@ -8,8 +8,8 @@ class CyberOwca(Zwierze):
         self._sila = 11
         self._inicjatywa = 4
 
-    def akcja(self):
-        self.__podazaj_za_barszczem(self.__get_najblizszy_barszcz)
+    def akcja(self, kierunek_czlowieka=None):
+        self.__podazaj_za_barszczem(self.__get_najblizszy_barszcz())
 
     def __get_najblizszy_barszcz(self):
         swiat = self._swiat

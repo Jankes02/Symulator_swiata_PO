@@ -7,8 +7,8 @@ class Lis(Zwierze):
         self._sila = 3
         self._inicjatywa = 7
 
-    def akcja(self):
-        kierunek = random.randint(0, LICZBA_KIERUNKOW)
+    def akcja(self, kierunek_czlowieka=None):
+        kierunek = random.randrange(LICZBA_KIERUNKOW)
         for i in range(LICZBA_KIERUNKOW):
             pole = self._swiat.get_sasiad(self._pozycja, kierunek)
             sasiad = self._swiat.sprawdz_pole(pole)
